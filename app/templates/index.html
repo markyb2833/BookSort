@@ -424,25 +424,20 @@
                                                 <label class="form-label">My Rating</label>
                                                 <div class="rating-input">
                                                     <div class="rating-stars" id="ratingStars{{ book.id }}"></div>
-                                                    <span class="rating-value" id="ratingValue{{ book.id }}">
-                                                        {{ "%.2f"|format(book.personal_rating or 0) }}
-                                                    </span>
-                                                    <input type="hidden" name="personal_rating" id="rating{{ book.id }}" 
-                                                           value="{{ book.personal_rating or 0 }}">
+                                                    <div id="ratingValue{{ book.id }}" class="rating-value">{{ "%.2f"|format(book.personal_rating) }}</div>
+                                                    <input type="hidden" name="personal_rating" id="rating{{ book.id }}" value="{{ book.personal_rating }}">
                                                 </div>
                                             </div>
                                             <div class="mb-3">
-                                                <label for="location{{ book.id }}" class="form-label">Box Location</label>
-                                                <input type="text" class="form-control" id="location{{ book.id }}" 
-                                                       name="box_location" value="{{ book.box_location or '' }}">
+                                                <label for="boxLocation{{ book.id }}" class="form-label">Box Location</label>
+                                                <input type="text" class="form-control" id="boxLocation{{ book.id }}" value="{{ book.box_location }}">
                                             </div>
                                             <div class="mb-3">
-                                                <label for="notes{{ book.id }}" class="form-label">My Notes</label>
-                                                <textarea class="form-control" id="notes{{ book.id }}" 
-                                                          name="notes" rows="3">{{ book.notes or '' }}</textarea>
+                                                <label for="notes{{ book.id }}" class="form-label">Notes</label>
+                                                <textarea class="form-control" id="notes{{ book.id }}" rows="3">{{ book.notes }}</textarea>
                                             </div>
-                                            <button type="button" class="btn btn-primary save-button" 
-                                                    id="saveButton{{ book.id }}" onclick="saveBook({{ book.id }})" disabled>
+                                            <button type="button" class="btn btn-primary save-button" id="saveButton{{ book.id }}" 
+                                                    onclick="saveChanges({{ book.id }})" disabled>
                                                 Save Changes
                                             </button>
                                         </form>
@@ -638,7 +633,7 @@
             document.getElementById(`ratingValue${bookId}`).textContent = rating.toFixed(2);
         }
 
-        function saveBook(bookId) {
+        function saveChanges(bookId) {
             const formData = new FormData(document.getElementById(`editForm${bookId}`));
             fetch('/edit_book', {
                 method: 'POST',
