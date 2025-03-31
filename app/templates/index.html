@@ -330,7 +330,7 @@
                     <div id="searchResults" class="search-results" style="display: none;"></div>
                 </div>
 
-                <form method="POST">
+                <form id="addBookForm" onsubmit="submitBook(event)">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -634,23 +634,68 @@
         }
 
         function saveChanges(bookId) {
-            const formData = new FormData(document.getElementById(`editForm${bookId}`));
-            fetch('/edit_book', {
-                method: 'POST',
-                body: formData
+            const formData = {
+                personal_rating: document.getElementById(`rating${bookId}`).value,
+                box_location: document.getElementById(`boxLocation${bookId}`).value,
+                notes: document.getElementById(`notes${bookId}`).value
+            };
+
+            fetch(`/update_book/${bookId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
             })
             .then(response => response.json())
             .then(data => {
-                if (data.success) {
-                    const saveButton = document.getElementById(`saveButton${bookId}`);
-                    saveButton.disabled = true;
-                    saveButton.textContent = 'Saved!';
-                    setTimeout(() => {
-                        saveButton.textContent = 'Save Changes';
-                    }, 2000);
+                const saveButton = document.getElementById(`saveButton${bookId}`);
+                saveButton.disabled = true;
+                saveButton.textContent = 'Saved!';
+                setTimeout(() => {
+                    saveButton.textContent = 'Save Changes';
+                }, 2000);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating book');
+            });
+        }
+
+        function submitBook(event) {
+            event.preventDefault();
+            
+            const formData = {
+                title: document.getElementById('title').value,
+                author: document.getElementById('author').value,
+                isbn: document.getElementById('isbn').value,
+                publication_year: document.getElementById('publication_year').value,
+                genre: document.getElementById('genre').value,
+                description: document.getElementById('description').value,
+                rating: document.getElementById('rating').value,
+                personal_rating: 0,
+                box_location: '',
+                notes: ''
+            };
+
+            fetch('/add_book', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.id) {
+                    window.location.reload();
                 } else {
-                    alert('Error updating book');
+                    alert('Error adding book: ' + (data.error || 'Unknown error'));
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error adding book');
             });
         }
 
