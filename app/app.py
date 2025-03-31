@@ -32,6 +32,22 @@ class Book(db.Model):
     notes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'author': self.author,
+            'isbn': self.isbn,
+            'publication_year': self.publication_year,
+            'genre': self.genre,
+            'description': self.description,
+            'rating': self.rating,
+            'personal_rating': self.personal_rating,
+            'box_location': self.box_location,
+            'notes': self.notes,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
 # Create tables
 with app.app_context():
     db.create_all()
@@ -87,24 +103,24 @@ def add_book():
         )
         db.session.add(book)
         db.session.commit()
-        flash('Book added successfully!', 'success')
-        return jsonify({'success': True})
+        return jsonify(book.to_dict()), 201
     except Exception as e:
-        flash('Error adding book.', 'error')
-        return jsonify({'success': False, 'error': str(e)})
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
 
-@app.route('/update_book/<int:book_id>', methods=['POST'])
+@app.route('/update_book/<int:book_id>', methods=['PUT'])
 def update_book(book_id):
     try:
         book = Book.query.get_or_404(book_id)
         data = request.json
-        book.personal_rating = float(data['rating'])
+        book.personal_rating = float(data['personal_rating']) if data['personal_rating'] else 0
         book.box_location = data['box_location']
         book.notes = data['notes']
         db.session.commit()
-        return jsonify({'success': True})
+        return jsonify(book.to_dict())
     except Exception as e:
-        return jsonify({'success': False, 'error': str(e)})
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 400
 
 if __name__ == '__main__':
     debug = os.environ.get('FLASK_ENV') == 'development'
