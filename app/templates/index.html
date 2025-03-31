@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookSort - Your Personal Library Organizer</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+        .card {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            height: 100%;
+            display: flex;
+            flex-direction: row;
+        }
+        .card-body {
+            color: #e0e0e0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 1rem;
+        }
+        .text-muted {
+            color: #999 !important;
+        }
+        .navbar {
+            background-color: #1e1e1e !important;
+            border-bottom: 1px solid #333;
+        }
+        .cover-container {
+            width: 120px;
+            min-width: 120px;
+            height: 180px;
+            position: relative;
+            background-color: #2d2d2d;
+            border-top-left-radius: calc(0.375rem - 1px);
+            border-bottom-left-radius: calc(0.375rem - 1px);
+        }
+        .book-cover {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background-color: #2d2d2d;
+            padding: 0.5rem;
+        }
+        .rating {
+            color: #ffd700;
+        }
+        .no-cover {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 2rem;
+        }
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+        .card-title {
+            font-size: 1.1rem;
+            line-height: 1.3;
+            margin-bottom: 0.25rem;
+        }
+        .card-subtitle {
+            font-size: 0.9rem;
+        }
+        .book-details {
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        .description-container {
+            position: relative;
+            margin-bottom: 1rem;
+            flex: 1;
+            min-height: 0;
+        }
+        .description-text {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin: 0;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+        }
+        .personal-section {
+            background-color: #252525;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+        .save-button {
+            width: 100%;
+            margin-top: 1rem;
+        }
+        .save-button:disabled {
+            cursor: default;
+        }
+        .rating-input {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .rating-stars {
+            color: #ffd700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .rating-stars i {
+            margin-right: 2px;
+            font-size: 1.25rem;
+        }
+        .rating-value {
+            min-width: 3em;
+            color: #999;
+        }
+        .personal-rating {
+            color: #00ff00;
+        }
+        .google-rating {
+            color: #ffd700;
+        }
+        .quarter-buttons {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .quarter-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.25rem;
+        }
+        .quarter-button {
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            color: #ffd700;
+            padding: 0.25rem;
+            font-size: 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            width: 100%;
+            text-align: center;
+        }
+        .quarter-button:hover {
+            background-color: #3d3d3d;
+            border-color: #ffd700;
+        }
+        .quarter-button:active {
+            background-color: #4d4d4d;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .card {
+                flex-direction: column;
+            }
+            .cover-container {
+                width: 100%;
+                height: 200px;
+                border-radius: calc(0.375rem - 1px) calc(0.375rem - 1px) 0 0;
+            }
+            .book-cover {
+                padding: 1rem;
+            }
+            .col-md-4 {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            .container {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            .card-body {
+                padding: 1rem;
+            }
+            .personal-section {
+                margin-top: 0.5rem;
+                padding: 0.75rem;
+            }
+            .rating-input {
+                gap: 0.25rem;
+            }
+        }
+
+        /* Add Book Section Styles */
+        .add-book-section {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 0.375rem;
+            margin-bottom: 2rem;
+        }
+        .add-book-header {
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .add-book-header:hover {
+            background-color: #2d2d2d;
+        }
+        .add-book-content {
+            padding: 1rem;
+            display: none;
+        }
+        .search-results {
+            background-color: #2d2d2d;
+            border: 1px solid #333;
+            border-radius: 4px;
+            margin-top: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .book-result {
+            padding: 10px;
+            border-bottom: 1px solid #333;
+            cursor: pointer;
+            display: flex;
+            align-items: start;
+        }
+        .book-result:hover {
+            background-color: #383838;
+        }
+        .book-result:last-child {
+            border-bottom: none;
+        }
+        .result-cover {
+            width: 60px;
+            height: 90px;
+            object-fit: contain;
+            margin-right: 15px;
+            background-color: #1e1e1e;
+        }
+        .filters {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 0.375rem;
+            padding: 1rem;
+        }
+        .filters .form-control,
+        .filters .form-select {
+            background-color: #2d2d2d;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+        .filters .input-group-text {
+            background-color: #2d2d2d;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+        .filters .btn-outline-secondary {
+            border-color: #444;
+            color: #e0e0e0;
+        }
+        .filters .btn-outline-secondary:hover {
+            background-color: #2d2d2d;
+            border-color: #666;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg mb-4">
+        <div class="container">
+            <a class="navbar-brand" href="/">BookSort</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="filters mb-4">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control" id="searchInput" placeholder="Search titles...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="readFilter">
+                        <option value="all">All Books</option>
+                        <option value="read">Read</option>
+                        <option value="unread">Not Read</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="sortBy">
+                        <option value="title">Sort by Title</option>
+                        <option value="googleRating">Sort by Google Rating</option>
+                        <option value="personalRating">Sort by My Rating</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-outline-secondary w-100" id="sortDirection">
+                        <i class="bi bi-sort-down"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="add-book-section mb-4">
+            <div class="add-book-header" onclick="toggleAddBook()">
+                <h2 class="m-0">Add New Book</h2>
+                <i class="bi bi-chevron-down" id="toggleIcon"></i>
+            </div>
+            <div class="add-book-content" id="addBookContent">
+                <div class="mb-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="bookSearchInput" placeholder="Search for a book...">
+                        <button class="btn btn-primary" type="button" id="searchButton">Search</button>
+                    </div>
+                    <div id="searchResults" class="search-results" style="display: none;"></div>
+                </div>
+
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="author" class="form-label">Author</label>
+                                <input type="text" class="form-control" id="author" name="author" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="isbn" class="form-label">ISBN</label>
+                                <input type="text" class="form-control" id="isbn" name="isbn">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="publication_year" class="form-label">Publication Year</label>
+                                <input type="number" class="form-control" id="publication_year" name="publication_year">
+                            </div>
+                            <div class="mb-3">
+                                <label for="genre" class="form-label">Genre</label>
+                                <input type="text" class="form-control" id="genre" name="genre">
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="cover_url" name="cover_url">
+                    <input type="hidden" id="rating" name="rating">
+                    <button type="submit" class="btn btn-primary">Add Book</button>
+                </form>
+            </div>
+        </div>
+
+        <h1>Your Library</h1>
+        {% if books %}
+            <div class="row g-4" id="bookGrid">
+                {% for book in books %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card">
+                            <div class="cover-container">
+                                {% if book.cover_url %}
+                                    <img src="{{ book.cover_url }}" class="book-cover" alt="{{ book.title }} cover">
+                                {% else %}
+                                    <div class="no-cover">
+                                        <i class="bi bi-book"></i>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-body">
+                                <div class="card-content">
+                                    <h5 class="card-title mb-1">{{ book.title }}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">{{ book.author }}</h6>
+                                    
+                                    <div class="ratings mb-2">
+                                        {% if book.rating %}
+                                            <div class="google-rating">
+                                                {% for i in range(5) %}
+                                                    {% if i < book.rating|int %}
+                                                        <i class="bi bi-star-fill"></i>
+                                                    {% elif i < book.rating and i >= book.rating|int %}
+                                                        <i class="bi bi-star-half"></i>
+                                                    {% else %}
+                                                        <i class="bi bi-star"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <small class="text-muted ms-1">(Google: {{ "%.1f"|format(book.rating) }})</small>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="book-details mb-2">
+                                        <small class="text-muted d-block">ISBN: {{ book.isbn }}</small>
+                                        <small class="text-muted d-block">Year: {{ book.publication_year }}</small>
+                                        <small class="text-muted d-block">Genre: {{ book.genre }}</small>
+                                    </div>
+
+                                    {% if book.description %}
+                                        <div class="description-container">
+                                            <p class="description-text">{{ book.description }}</p>
+                                        </div>
+                                    {% endif %}
+
+                                    <div class="personal-section">
+                                        <form id="editForm{{ book.id }}" onsubmit="return false;">
+                                            <input type="hidden" name="book_id" value="{{ book.id }}">
+                                            <div class="mb-3">
+                                                <label class="form-label">My Rating</label>
+                                                <div class="rating-input">
+                                                    <div class="rating-stars" id="ratingStars{{ book.id }}"></div>
+                                                    <span class="rating-value" id="ratingValue{{ book.id }}">
+                                                        {{ "%.2f"|format(book.personal_rating or 0) }}
+                                                    </span>
+                                                    <input type="hidden" name="personal_rating" id="rating{{ book.id }}" 
+                                                           value="{{ book.personal_rating or 0 }}">
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="location{{ book.id }}" class="form-label">Box Location</label>
+                                                <input type="text" class="form-control" id="location{{ book.id }}" 
+                                                       name="box_location" value="{{ book.box_location or '' }}">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="notes{{ book.id }}" class="form-label">My Notes</label>
+                                                <textarea class="form-control" id="notes{{ book.id }}" 
+                                                          name="notes" rows="3">{{ book.notes or '' }}</textarea>
+                                            </div>
+                                            <button type="button" class="btn btn-primary save-button" 
+                                                    id="saveButton{{ book.id }}" onclick="saveBook({{ book.id }})" disabled>
+                                                Save Changes
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="lead">No books in your library yet. Add your first book!</p>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleAddBook() {
+            const content = document.getElementById('addBookContent');
+            const icon = document.getElementById('toggleIcon');
+            if (content.style.display === 'none' || !content.style.display) {
+                content.style.display = 'block';
+                icon.classList.remove('bi-chevron-down');
+                icon.classList.add('bi-chevron-up');
+            } else {
+                content.style.display = 'none';
+                icon.classList.remove('bi-chevron-up');
+                icon.classList.add('bi-chevron-down');
+            }
+        }
+
+        document.getElementById('searchButton').addEventListener('click', searchBooks);
+        document.getElementById('bookSearchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchBooks();
+            }
+        });
+
+        function searchBooks() {
+            const query = document.getElementById('bookSearchInput').value;
+            if (!query) return;
+
+            fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    const resultsDiv = document.getElementById('searchResults');
+                    resultsDiv.innerHTML = '';
+                    resultsDiv.style.display = 'block';
+
+                    if (data.items) {
+                        data.items.slice(0, 5).forEach(book => {
+                            const volumeInfo = book.volumeInfo;
+                            const coverUrl = volumeInfo.imageLinks ? volumeInfo.imageLinks.thumbnail : '';
+                            
+                            const resultDiv = document.createElement('div');
+                            resultDiv.className = 'book-result';
+                            resultDiv.innerHTML = `
+                                ${coverUrl ? `<img src="${coverUrl}" class="result-cover" alt="Book cover">` : 
+                                           '<div class="result-cover d-flex align-items-center justify-content-center"><i class="bi bi-book"></i></div>'}
+                                <div>
+                                    <h5 class="mb-1">${volumeInfo.title}</h5>
+                                    <p class="mb-1">${volumeInfo.authors ? volumeInfo.authors.join(', ') : 'Unknown author'}</p>
+                                    <small class="text-muted">${volumeInfo.publishedDate ? volumeInfo.publishedDate.substring(0, 4) : ''}</small>
+                                </div>
+                            `;
+
+                            resultDiv.addEventListener('click', () => {
+                                document.getElementById('title').value = volumeInfo.title || '';
+                                document.getElementById('author').value = volumeInfo.authors ? volumeInfo.authors.join(', ') : '';
+                                document.getElementById('isbn').value = volumeInfo.industryIdentifiers ? 
+                                    volumeInfo.industryIdentifiers[0].identifier : '';
+                                document.getElementById('publication_year').value = volumeInfo.publishedDate ? 
+                                    volumeInfo.publishedDate.substring(0, 4) : '';
+                                document.getElementById('description').value = volumeInfo.description || '';
+                                document.getElementById('cover_url').value = coverUrl;
+                                document.getElementById('rating').value = volumeInfo.averageRating || '';
+                                document.getElementById('genre').value = volumeInfo.categories ? 
+                                    volumeInfo.categories[0] : '';
+                                
+                                resultsDiv.style.display = 'none';
+                            });
+
+                            resultsDiv.appendChild(resultDiv);
+                        });
+                    } else {
+                        resultsDiv.innerHTML = '<p class="p-3">No results found</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    const resultsDiv = document.getElementById('searchResults');
+                    resultsDiv.innerHTML = '<p class="p-3">Error searching for books</p>';
+                    resultsDiv.style.display = 'block';
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            {% for book in books %}
+                initializeBookRating({{ book.id }}, {{ book.personal_rating or 0 }});
+                initializeFormTracking({{ book.id }});
+            {% endfor %}
+        });
+
+        function initializeFormTracking(bookId) {
+            const form = document.getElementById(`editForm${bookId}`);
+            const saveButton = document.getElementById(`saveButton${bookId}`);
+            const initialState = getFormState(form);
+
+            // Track changes in form inputs
+            form.querySelectorAll('input, textarea').forEach(input => {
+                input.addEventListener('input', () => {
+                    const currentState = getFormState(form);
+                    saveButton.disabled = JSON.stringify(initialState) === JSON.stringify(currentState);
+                });
+            });
+        }
+
+        function getFormState(form) {
+            const formData = new FormData(form);
+            const state = {};
+            for (let [key, value] of formData.entries()) {
+                state[key] = value;
+            }
+            return state;
+        }
+
+        function initializeBookRating(bookId, initialRating) {
+            const container = document.getElementById(`ratingStars${bookId}`);
+            container.innerHTML = '';
+            
+            // Create stars for display
+            const starsContainer = document.createElement('div');
+            starsContainer.style.marginBottom = '0.5rem';
+            for (let i = 0; i < 5; i++) {
+                const star = document.createElement('i');
+                star.className = 'bi bi-star';
+                starsContainer.appendChild(star);
+            }
+            container.appendChild(starsContainer);
+
+            // Create rating dropdown
+            const select = document.createElement('select');
+            select.className = 'form-select form-select-sm';
+            select.style.width = 'auto';
+            select.style.minWidth = '5rem';
+            select.style.backgroundColor = '#2d2d2d';
+            select.style.color = '#ffd700';
+            select.style.border = '1px solid #444';
+            
+            // Add options from 0 to 5 in 0.25 increments
+            for (let i = 0; i <= 5; i += 0.25) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i.toFixed(2);
+                if (i === initialRating) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            }
+
+            select.addEventListener('change', () => {
+                const rating = parseFloat(select.value);
+                updateBookStars(bookId, rating);
+                document.getElementById(`rating${bookId}`).value = rating;
+                document.getElementById(`saveButton${bookId}`).disabled = false;
+            });
+
+            container.appendChild(select);
+
+            updateBookStars(bookId, initialRating);
+        }
+
+        function updateBookStars(bookId, rating) {
+            const stars = document.querySelectorAll(`#ratingStars${bookId} i`);
+            stars.forEach((star, index) => {
+                if (index < Math.floor(rating)) {
+                    star.className = 'bi bi-star-fill';
+                } else if (index === Math.floor(rating)) {
+                    const fraction = rating % 1;
+                    if (fraction >= 0.75) {
+                        star.className = 'bi bi-star-fill';
+                    } else if (fraction >= 0.5) {
+                        star.className = 'bi bi-star-half';
+                    } else if (fraction >= 0.25) {
+                        star.className = 'bi bi-star-half';
+                    } else {
+                        star.className = 'bi bi-star';
+                    }
+                } else {
+                    star.className = 'bi bi-star';
+                }
+            });
+            document.getElementById(`ratingValue${bookId}`).textContent = rating.toFixed(2);
+        }
+
+        function saveBook(bookId) {
+            const formData = new FormData(document.getElementById(`editForm${bookId}`));
+            fetch('/edit_book', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const saveButton = document.getElementById(`saveButton${bookId}`);
+                    saveButton.disabled = true;
+                    saveButton.textContent = 'Saved!';
+                    setTimeout(() => {
+                        saveButton.textContent = 'Save Changes';
+                    }, 2000);
+                } else {
+                    alert('Error updating book');
+                }
+            });
+        }
+
+        // Add filtering and sorting functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterInput = document.getElementById('searchInput');
+            const readFilter = document.getElementById('readFilter');
+            const sortBy = document.getElementById('sortBy');
+            const sortDirection = document.getElementById('sortDirection');
+            const bookGrid = document.getElementById('bookGrid');
+            let isAscending = false;
+
+            function filterAndSortBooks() {
+                const books = Array.from(bookGrid.children);
+                const searchTerm = filterInput.value.toLowerCase();
+                const readStatus = readFilter.value;
+                const sortKey = sortBy.value;
+
+                books.forEach(book => {
+                    const title = book.querySelector('h5').textContent.toLowerCase();
+                    const hasRating = parseFloat(book.querySelector('input[name="personal_rating"]').value) > 0;
+                    
+                    // Apply filters
+                    let visible = title.includes(searchTerm);
+                    if (readStatus === 'read') {
+                        visible = visible && hasRating;
+                    } else if (readStatus === 'unread') {
+                        visible = visible && !hasRating;
+                    }
+                    
+                    book.style.display = visible ? '' : 'none';
+                });
+
+                // Sort visible books
+                const visibleBooks = books.filter(book => book.style.display !== 'none');
+                visibleBooks.sort((a, b) => {
+                    let valueA, valueB;
+                    
+                    if (sortKey === 'title') {
+                        valueA = a.querySelector('h5').textContent.toLowerCase();
+                        valueB = b.querySelector('h5').textContent.toLowerCase();
+                    } else if (sortKey === 'googleRating') {
+                        valueA = parseFloat(a.querySelector('.google-rating small').textContent.match(/\d+\.\d+/) || 0);
+                        valueB = parseFloat(b.querySelector('.google-rating small').textContent.match(/\d+\.\d+/) || 0);
+                    } else if (sortKey === 'personalRating') {
+                        valueA = parseFloat(a.querySelector('input[name="personal_rating"]').value) || 0;
+                        valueB = parseFloat(b.querySelector('input[name="personal_rating"]').value) || 0;
+                    }
+
+                    if (isAscending) {
+                        return valueA > valueB ? 1 : -1;
+                    } else {
+                        return valueA < valueB ? 1 : -1;
+                    }
+                });
+
+                // Reorder DOM
+                visibleBooks.forEach(book => bookGrid.appendChild(book));
+            }
+
+            // Event listeners
+            if (filterInput) filterInput.addEventListener('input', filterAndSortBooks);
+            if (readFilter) readFilter.addEventListener('change', filterAndSortBooks);
+            if (sortBy) sortBy.addEventListener('change', filterAndSortBooks);
+            
+            if (sortDirection) {
+                sortDirection.addEventListener('click', () => {
+                    isAscending = !isAscending;
+                    sortDirection.querySelector('i').className = isAscending ? 'bi bi-sort-up' : 'bi bi-sort-down';
+                    filterAndSortBooks();
+                });
+            }
+
+            // Initialize sorting
+            filterAndSortBooks();
+        });
+    </script>
+</body>
+</html> 
