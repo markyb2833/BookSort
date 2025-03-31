@@ -30,6 +30,7 @@ class Book(db.Model):
     personal_rating = db.Column(db.Float, default=0)
     box_location = db.Column(db.String(100))
     notes = db.Column(db.Text)
+    cover_url = db.Column(db.String(500))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
@@ -45,6 +46,7 @@ class Book(db.Model):
             'personal_rating': self.personal_rating,
             'box_location': self.box_location,
             'notes': self.notes,
+            'cover_url': self.cover_url,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
@@ -99,7 +101,8 @@ def add_book():
             rating=float(data['rating']) if data['rating'] else 0,
             personal_rating=0,
             box_location='',
-            notes=''
+            notes='',
+            cover_url=data.get('cover_url', '')
         )
         db.session.add(book)
         db.session.commit()
