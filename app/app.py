@@ -52,7 +52,6 @@ class Book(db.Model):
 
 # Create tables
 with app.app_context():
-    db.drop_all()  # Drop all existing tables
     db.create_all()  # Create new tables with the updated schema
 
 @app.route('/')
